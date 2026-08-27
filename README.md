@@ -40,7 +40,7 @@ The branch temporarily selects JNI for FFI-capable targets so desktop and Androi
 | AES-CTR | `AES/CTR/NoPadding` with Web Crypto counter handling | Merged | [#316](https://github.com/google/webcrypto.dart/pull/316) |
 | RSASSA-PKCS1-v1_5 | JCA `Signature` | Merged | [#323](https://github.com/google/webcrypto.dart/pull/323) |
 | RSA-OAEP | JCA `Cipher` with OAEP parameters | Merged | [#340](https://github.com/google/webcrypto.dart/pull/340) |
-| RSA-PSS | JCA `Signature` with `PSSParameterSpec` | Merged; follow-up open | [#341](https://github.com/google/webcrypto.dart/pull/341), [#375](https://github.com/google/webcrypto.dart/pull/375) |
+| RSA-PSS | JCA `Signature` with `PSSParameterSpec` | Merged | [#341](https://github.com/google/webcrypto.dart/pull/341), [#375](https://github.com/google/webcrypto.dart/pull/375) |
 | ECDSA | P-256, P-384, and P-521 | Merged | [#351](https://github.com/google/webcrypto.dart/pull/351) |
 | ECDH | `KeyAgreement` on P-256, P-384, and P-521 | Merged | [#360](https://github.com/google/webcrypto.dart/pull/360) |
 | HKDF | RFC 5869 over JCA `Mac` | Merged | [#356](https://github.com/google/webcrypto.dart/pull/356) |
@@ -56,7 +56,7 @@ The branch temporarily selects JNI for FFI-capable targets so desktop and Androi
 | M4 | Performance, binary-size, documentation, and packaging analysis | In progress; measurements and provider findings exist, documentation is draft, and [#372](https://github.com/google/webcrypto.dart/issues/372) tracks packaging. |
 | M5 | Cleanup, integrated branch, final report, and demo | In progress; the integration branch and report exist, while selector, CI, and production packaging remain open. |
 
-I plan to continue the project after GSoC, starting with the open correctness PRs and the PBKDF2, RSA compatibility, backend-selection, packaging, and CI work listed below.
+I plan to continue the project after GSoC, starting with the open test and documentation PRs, followed by the PBKDF2, RSA compatibility, backend-selection, packaging, and CI work listed below.
 
 ## Validation Results
 
@@ -87,7 +87,7 @@ The current loop crosses JNI and copies an intermediate value during each round.
 
 ## Pull Requests
 
-I opened 31 PRs during the project: 25 have merged, three remain open, and three remain draft.
+I opened 31 PRs during the project: 27 have merged, three remain open, and one remains draft.
 
 ### Merged
 
@@ -118,16 +118,16 @@ I opened 31 PRs during the project: 25 have merged, three remain open, and three
 | 23 | [#356](https://github.com/google/webcrypto.dart/pull/356) | `feat(impl_jni): add JCA HKDF implementation` | `android-jca-branch` | Merged |
 | 24 | [#360](https://github.com/google/webcrypto.dart/pull/360) | `feat(impl_jni): add JCA ECDH implementation` | `android-jca-branch` | Merged |
 | 25 | [#373](https://github.com/google/webcrypto.dart/pull/373) | `chore: sync android-jca-branch with master` | `android-jca-branch` | Merged |
+| 26 | [#375](https://github.com/google/webcrypto.dart/pull/375) | `fix(impl_jni): configure RSA-PSS parameters after initialization` | `android-jca-branch` | Merged |
+| 27 | [#376](https://github.com/google/webcrypto.dart/pull/376) | `fix(impl_jni): validate JWK base64url and RSA public imports` | `android-jca-branch` | Merged |
 
 ### Open and Draft
 
 | # | PR | Title | Status | Notes |
 | ---: | --- | --- | --- | --- |
-| 26 | [#357](https://github.com/google/webcrypto.dart/pull/357) | `feat(impl_jni): add JCA PBKDF2 implementation` | Open | Experimental reference; production design remains open in [#361](https://github.com/google/webcrypto.dart/issues/361). |
-| 27 | [#375](https://github.com/google/webcrypto.dart/pull/375) | `fix(impl_jni): configure RSA-PSS parameters after initialization` | Open | Fixes the parameter order required by the tested Android provider. |
-| 28 | [#376](https://github.com/google/webcrypto.dart/pull/376) | `fix(impl_jni): validate JWK base64url and RSA public imports` | Open | Applies the shared JWK validation behavior to JNI. |
-| 29 | [#377](https://github.com/google/webcrypto.dart/pull/377) | `test(impl_jni): compare public error categories with FFI` | Draft | Establishes cross-backend error-category coverage. |
-| 30 | [#378](https://github.com/google/webcrypto.dart/pull/378) | `test(jni): initialize desktop JNI in standalone public-API tests` | Draft | Makes standalone VM tests start the desktop JVM. |
+| 28 | [#357](https://github.com/google/webcrypto.dart/pull/357) | `feat(impl_jni): add JCA PBKDF2 implementation` | Open | Experimental reference; production design remains open in [#361](https://github.com/google/webcrypto.dart/issues/361). |
+| 29 | [#377](https://github.com/google/webcrypto.dart/pull/377) | `test(impl_jni): compare public error categories with FFI` | Open | Establishes cross-backend error-category coverage. |
+| 30 | [#378](https://github.com/google/webcrypto.dart/pull/378) | `test(jni): initialize desktop JNI in standalone public-API tests` | Open | Makes standalone VM tests start the desktop JVM. |
 | 31 | [#379](https://github.com/google/webcrypto.dart/pull/379) | `docs(jca): document experimental JCA backend status` | Draft | Records the provider evidence, limitations, and remaining integration work. |
 
 ## Issues
@@ -145,7 +145,7 @@ I opened 31 PRs during the project: 25 have merged, three remain open, and three
 
 JCA exposes a common API, but providers differ in accepted parameters, algorithm aliases, and key wrapper types. The backend must report provider limitations without claiming one emulator represents Android as a whole.
 
-Desktop SunJCE rejects 32- and 64-bit AES-GCM tags that Web Crypto permits. The tested Android API 24 and 36 providers accept them. Android API 36 resets RSA-PSS parameters during signature initialization, while the tested API 24-26 providers hide RSA CRT parameters after PKCS#8 import. PR [#375](https://github.com/google/webcrypto.dart/pull/375) and issue [#371](https://github.com/google/webcrypto.dart/issues/371) track these separate problems.
+Desktop SunJCE rejects 32- and 64-bit AES-GCM tags that Web Crypto permits. The tested Android API 24 and 36 providers accept them. Android API 36 resets RSA-PSS parameters during signature initialization, while the tested API 24-26 providers hide RSA CRT parameters after PKCS#8 import. PR [#375](https://github.com/google/webcrypto.dart/pull/375) fixes the API 36 parameter order, while issue [#371](https://github.com/google/webcrypto.dart/issues/371) tracks the API 24-26 key-wrapper problem.
 
 ### PBKDF2
 
@@ -157,7 +157,7 @@ The project has not delivered the proposed binary-size reduction yet. The curren
 
 ### Next steps
 
-- Resolve and merge the active correctness and test PRs.
+- Review and merge the active test and documentation PRs.
 - Decide the PBKDF2 implementation boundary in [#361](https://github.com/google/webcrypto.dart/issues/361).
 - Resolve RSA private-key imports for the supported provider and API range in [#371](https://github.com/google/webcrypto.dart/issues/371).
 - Agree on backend registration, package ownership, and native-asset behavior in [#372](https://github.com/google/webcrypto.dart/issues/372).
